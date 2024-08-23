@@ -1,3 +1,11 @@
+# custom config
+`docker build --no-cache -t v2rayng-custom .` - build image
+
+RUN BUILD APK:
+
+```
+docker run --rm -v $(pwd)/output:/output v2rayng-custom assembleRelease -PmyArgument=https://example.com/s/123123123123 --stacktrace --info --console=plain
+```
 # v2rayNG
 
 A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
