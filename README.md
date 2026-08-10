@@ -1,50 +1,79 @@
-# custom config
-`docker build --no-cache -t v2rayng-custom .` - build image
+# v2rayNG Subscription Builder
 
-RUN BUILD APK:
+[Перейти к русской версии](#русский)
 
-```
-docker run --rm -v $(pwd)/output:/output v2rayng-custom assembleRelease -PmyArgument=https://example.com/s/123123123123 --stacktrace --info --console=plain
-```
-# v2rayNG
+## English
 
-A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
+### Overview
+Docker image for building v2rayNG with automatic subscription URL import. On first launch, the subscription is imported and activated.
 
-[![API](https://img.shields.io/badge/API-21%2B-yellow.svg?style=flat)](https://developer.android.com/about/versions/lollipop)
-[![Kotlin Version](https://img.shields.io/badge/Kotlin-1.6.21-blue.svg)](https://kotlinlang.org)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/2dust/v2rayNG)](https://github.com/2dust/v2rayNG/commits/master)
-[![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayng/badge)](https://www.codefactor.io/repository/github/2dust/v2rayng)
-[![GitHub Releases](https://img.shields.io/github/downloads/2dust/v2rayNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
-[![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/v2rayn)
-
-<a href="https://play.google.com/store/apps/details?id=com.v2ray.ang">
-<img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="165" height="64" />
-</a>
-
-### Assemble with pre-installed subscription-link
-Execute:
-`./gradlew assembleRelease -PmyArgument=MY_CUSTOM_LINK`
-
-libv2ray.aar version is 1.8.17 from https://github.com/2dust/AndroidLibXrayLite/releases
-
-### Telegram Channel
-[github_2dust](https://t.me/github_2dust)
+### Features
+- Builds v2rayNG from upstream
+- Adds subscription URL at build time
+- Automatic import on first app launch
+- Multi-arch support (arm64-v8a, armeabi-v7a, x86_64, x86)
 
 ### Usage
+**Recommended:** Use prebuilt image from GitHub Container Registry.
 
-#### Geoip and Geosite
-- geoip.dat and geosite.dat files are in `Android/data/com.v2ray.ang/files/assets` (path may differ on some Android device)
-- download feature will get enhanced version in this [repo](https://github.com/Loyalsoldier/v2ray-rules-dat) (Note it need a working proxy)
-- latest official [domain list](https://github.com/v2fly/domain-list-community) and [ip list](https://github.com/v2fly/geoip) can be imported manually
-- possible to use third party dat file in the same folder, like [h2y](https://guide.v2fly.org/routing/sitedata.html#%E5%A4%96%E7%BD%AE%E7%9A%84%E5%9F%9F%E5%90%8D%E6%96%87%E4%BB%B6)
+```bash
+docker run --rm -v $(pwd)/output:/output ghcr.io/momai/v2rayng-dockerfile:latest -PmyArgument=https://example.com/s/your-subscription-url
+```
+- **Replace** the URL with your **subscription link**.
+- APKs will appear in `output/`.
 
-### More in our [wiki](https://github.com/2dust/v2rayNG/wiki)
+**Build locally:**
+```bash
+docker build --no-cache -t v2rayng-custom .
+docker run --rm -v $(pwd)/output:/output v2rayng-custom -PmyArgument=https://example.com/s/your-subscription-url
+```
 
-### Development guide
+### How it works
+- Clones upstream v2rayNG
+- Injects subscription URL (string resource and asset file)
+- Modifies MainActivity for auto-import
+- Builds APKs and copies to `output/`
 
-Android project under V2rayNG folder can be compiled directly in Android Studio, or using Gradle wrapper. But the v2ray core inside the aar is (probably) outdated.  
-The aar can be compiled from the Golang project [AndroidLibV2rayLite](https://github.com/2dust/AndroidLibV2rayLite) or [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite).
-For a quick start, read guide for [Go Mobile](https://github.com/golang/go/wiki/Mobile) and [Makefiles for Go Developers](https://tutorialedge.net/golang/makefiles-for-go-developers/)
+### Troubleshooting
+- Go/gomobile is not required: the image downloads a prebuilt `libv2ray.aar`.
+- If Gradle fails with `Cannot parse project property android.newDsl`, rebuild the Docker image so `gradle.properties` is patched with a proper newline.
+- If Android SDK errors mention `compileSdk`, update the installed platform in `Dockerfile` to match upstream v2rayNG.
 
-v2rayNG can run on Android Emulators. For WSA, VPN permission need to be granted via
-`appops set [package name] ACTIVATE_VPN allow`
+---
+
+## <a name="русский"></a>Русский
+
+### Описание
+Docker-образ для сборки v2rayNG с автоматическим импортом URL подписки. При первом запуске подписка импортируется и активируется.
+
+### Особенности
+- Сборка v2rayNG из апстрима
+- Добавление URL подписки на этапе сборки
+- Автоматический импорт при первом запуске
+- Поддержка всех архитектур (arm64-v8a, armeabi-v7a, x86_64, x86)
+
+### Использование
+**Рекомендуется:** использовать готовый образ из GitHub Container Registry.
+
+```bash
+docker run --rm -v $(pwd)/output:/output ghcr.io/momai/v2rayng-dockerfile:latest -PmyArgument=https://example.com/s/your-subscription-url
+```
+- Замените URL на ссылку вашей подписки.
+- APK-файлы появятся в папке `output/`.
+
+**Собрать локально:**
+```bash
+docker build --no-cache -t v2rayng-custom .
+docker run --rm -v $(pwd)/output:/output v2rayng-custom -PmyArgument=https://example.com/s/your-subscription-url
+```
+
+### Как работает
+- Клонирует апстрим v2rayNG
+- Вставляет URL подписки (строковый ресурс и файл в assets)
+- Модифицирует MainActivity для автоимпорта
+- Собирает APK и копирует в `output/`
+
+### Решение проблем
+- Go/gomobile больше не нужен: образ скачивает готовый `libv2ray.aar`.
+- Если Gradle падает с `Cannot parse project property android.newDsl`, пересоберите Docker-образ, чтобы `gradle.properties` патчился с корректным переводом строки.
+- Если Android SDK ругается на `compileSdk`, обновите платформу в `Dockerfile` под текущий upstream v2rayNG.
